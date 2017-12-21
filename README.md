@@ -21,19 +21,19 @@ import "github.com/euskadi31/go-eventemitter"
 func main() {
     emitter := eventemitter.New()
 
-	emitter.Subscribe("test", func() {
-		// code
-	})
+    emitter.Subscribe("test", func() {
+        // code
+    })
 
-	emitter.Subscribe("count", func(i int) {
-		// code
-	})
+    emitter.Subscribe("count", func(i int) {
+        // code
+    })
 
-	emitter.Dispatch("test")
+    emitter.Dispatch("test")
 
-	emitter.Dispatch("count", 42)
+    emitter.Dispatch("count", 42)
 
-	emitter.Wait()
+    emitter.Wait()
 }
 ```
 
