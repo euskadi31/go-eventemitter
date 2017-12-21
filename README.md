@@ -13,7 +13,7 @@ go-eventemitter is the little and lightweight event emitter library for Go.
 Example
 -------
 
-```
+```go
 package main
 
 import "github.com/euskadi31/go-eventemitter"
