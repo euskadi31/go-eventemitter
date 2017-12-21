@@ -1,0 +1,33 @@
+language: go
+
+sudo: required
+dist: trusty
+
+go:
+  - 1.7
+  - 1.8
+  - 1.9
+  - master
+  - tip
+
+matrix:
+  fast_finish: true
+  allow_failures:
+    - go: master
+    - go: tip
+
+cache: apt
+
+install:
+  - go get github.com/golang/dep/cmd/dep
+  - go get golang.org/x/tools/cmd/cover
+  - go get github.com/mattn/goveralls
+
+before_script:
+  - dep ensure -vendor-only
+
+script:
+  - make travis
+
+after_success:
+  - goveralls -service=travis-ci
