@@ -34,6 +34,7 @@ func main() {
 	emitter.Dispatch("count", 42)
 
 	emitter.Wait()
+}
 ```
 
 License
