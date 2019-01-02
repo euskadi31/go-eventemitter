@@ -100,7 +100,7 @@ func (e *emitter) Dispatch(name string, args ...interface{}) {
 		defer e.wg.Done()
 
 		l, ok := e.listeners[name]
-		if ok == false {
+		if !ok {
 			e.RUnlock()
 
 			return

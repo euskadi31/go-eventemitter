@@ -1,12 +1,11 @@
-Go Event Emitter ![Last release](https://img.shields.io/github/release/euskadi31/go-eventemitter.svg)
-===================
+Go Event Emitter [![Last release](https://img.shields.io/github/release/euskadi31/go-eventemitter.svg)](https://github.com/euskadi31/go-eventemitter/releases/latest) [![Documentation](https://godoc.org/github.com/euskadi31/go-eventemitter?status.svg)](https://godoc.org/github.com/euskadi31/go-eventemitter)
+================
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/euskadi31/go-eventemitter)](https://goreportcard.com/report/github.com/euskadi31/go-eventemitter)
 
 | Branch  | Status | Coverage |
 |---------|--------|----------|
 | master  | [![Build Status](https://img.shields.io/travis/euskadi31/go-eventemitter/master.svg)](https://travis-ci.org/euskadi31/go-eventemitter) | [![Coveralls](https://img.shields.io/coveralls/euskadi31/go-eventemitter/master.svg)](https://coveralls.io/github/euskadi31/go-eventemitter?branch=master) |
-| develop | [![Build Status](https://img.shields.io/travis/euskadi31/go-eventemitter/develop.svg)](https://travis-ci.org/euskadi31/go-eventemitter) | [![Coveralls](https://img.shields.io/coveralls/euskadi31/go-eventemitter/develop.svg)](https://coveralls.io/github/euskadi31/go-eventemitter?branch=develop) |
 
 go-eventemitter is the little and lightweight event emitter library for Go.
 
