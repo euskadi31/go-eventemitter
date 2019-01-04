@@ -10,10 +10,27 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type testSubscriber struct {
+}
+
+func (s testSubscriber) SubscribedEvents() map[string][]interface{} {
+	return map[string][]interface{}{
+		"test": {
+			s.onTest,
+		},
+	}
+}
+
+func (s *testSubscriber) onTest() {
+
+}
+
 func TestEmitter(t *testing.T) {
 	called := 0
 
 	em := New()
+
+	assert.Equal(t, 0, len(em.listeners))
 
 	em.Dispatch("test-empty")
 
@@ -21,9 +38,13 @@ func TestEmitter(t *testing.T) {
 		called++
 	})
 
+	assert.Equal(t, 1, len(em.listeners))
+
 	em.Subscribe("test", func() {
 		called++
 	})
+
+	assert.Equal(t, 1, len(em.listeners))
 
 	listener := func() {
 		called++
@@ -32,6 +53,8 @@ func TestEmitter(t *testing.T) {
 	em.Subscribe("test", listener)
 
 	em.Unsubscribe("test", listener)
+
+	assert.Equal(t, 1, len(em.listeners))
 
 	em.Dispatch("test")
 
@@ -45,6 +68,8 @@ func TestDispatchWithArguments(t *testing.T) {
 
 	em := New()
 
+	assert.Equal(t, 0, len(em.listeners))
+
 	em.Subscribe("test", func(i int) {
 		called += i
 	})
@@ -52,6 +77,8 @@ func TestDispatchWithArguments(t *testing.T) {
 	em.Subscribe("test", func(i int) {
 		called += i
 	})
+
+	assert.Equal(t, 1, len(em.listeners))
 
 	listener := func(i int) {
 		called += i
@@ -60,6 +87,8 @@ func TestDispatchWithArguments(t *testing.T) {
 	em.Subscribe("test", listener)
 
 	em.Unsubscribe("test", listener)
+
+	assert.Equal(t, 1, len(em.listeners))
 
 	em.Dispatch("test", 10)
 
@@ -73,15 +102,21 @@ func TestUnsubscribe(t *testing.T) {
 
 	em := New()
 
+	assert.Equal(t, 0, len(em.listeners))
+
 	em.Subscribe("test", func() {
 		called++
 	})
+
+	assert.Equal(t, 1, len(em.listeners))
 
 	listener := func() {
 		called++
 	}
 
 	em.Unsubscribe("test", listener)
+
+	assert.Equal(t, 1, len(em.listeners))
 
 	em.Unsubscribe("test-empty", listener)
 
@@ -90,6 +125,37 @@ func TestUnsubscribe(t *testing.T) {
 	em.Wait()
 
 	assert.Equal(t, 1, called)
+}
+
+func TestUnsubscribeAll(t *testing.T) {
+	em := New()
+
+	assert.Equal(t, 0, len(em.listeners))
+
+	listener := func() {}
+
+	em.Subscribe("test", listener)
+
+	assert.Equal(t, 1, len(em.listeners))
+
+	em.Unsubscribe("test", listener)
+	assert.Equal(t, 0, len(em.listeners))
+}
+
+func TestSubscriber(t *testing.T) {
+	em := New()
+
+	assert.Equal(t, 0, len(em.listeners))
+
+	ts := &testSubscriber{}
+
+	em.AddSubscriber(ts)
+
+	assert.Equal(t, 1, len(em.listeners))
+
+	//@TODO: bug
+	em.RemoveSubscriber(ts)
+	//assert.Equal(t, 0, len(em.listeners))
 }
 
 func BenchmarkDispatchParallel(b *testing.B) {
