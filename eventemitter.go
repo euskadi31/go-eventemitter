@@ -17,44 +17,71 @@ type EventEmitter interface {
 
 	Dispatch(name string, args ...interface{})
 
+	AddSubscriber(subscriber EventSubscriber)
+
+	RemoveSubscriber(subscriber EventSubscriber)
+
 	Wait()
 }
 
-var _ EventEmitter = (*emitter)(nil)
-
-type emitter struct {
+// Emitter struct
+type Emitter struct {
 	listeners map[string][]reflect.Value
 	sync.RWMutex
 	wg sync.WaitGroup
 }
 
 // New EventEmitter
-func New() EventEmitter {
-	return &emitter{
+func New() *Emitter {
+	return &Emitter{
 		listeners: make(map[string][]reflect.Value),
 		wg:        sync.WaitGroup{},
 	}
 }
 
-func (e *emitter) Subscribe(name string, listener interface{}) {
+// Subscribe adds an event listener that listens on the specified events.
+func (e *Emitter) Subscribe(name string, listener interface{}) {
 	e.Lock()
 	defer e.Unlock()
 
 	e.listeners[name] = append(e.listeners[name], reflect.ValueOf(listener))
 }
 
-func (e *emitter) Unsubscribe(name string, listener interface{}) {
+// Unsubscribe removes an event listener from the specified events.
+func (e *Emitter) Unsubscribe(name string, listener interface{}) {
 	e.Lock()
 	defer e.Unlock()
 
 	if listeners, ok := e.listeners[name]; ok && len(listeners) > 0 {
 		e.removeListener(listeners, name, e.findListenerIdx(listeners, reflect.ValueOf(listener)))
+
+		if len(e.listeners[name]) == 0 {
+			delete(e.listeners, name)
+		}
 	}
 }
 
-func (e *emitter) findListenerIdx(listeners []reflect.Value, listener reflect.Value) int {
+// AddSubscriber adds an event subscriber.
+func (e *Emitter) AddSubscriber(subscriber EventSubscriber) {
+	for name, listeners := range subscriber.SubscribedEvents() {
+		for _, listener := range listeners {
+			e.Subscribe(name, listener)
+		}
+	}
+}
+
+// RemoveSubscriber removes an event subscriber.
+func (e *Emitter) RemoveSubscriber(subscriber EventSubscriber) {
+	for name, listeners := range subscriber.SubscribedEvents() {
+		for _, listener := range listeners {
+			e.Unsubscribe(name, listener)
+		}
+	}
+}
+
+func (e *Emitter) findListenerIdx(listeners []reflect.Value, listener reflect.Value) int {
 	for idx, l := range listeners {
-		if l == listener {
+		if reflect.DeepEqual(l, listener) {
 			return idx
 		}
 	}
@@ -62,7 +89,7 @@ func (e *emitter) findListenerIdx(listeners []reflect.Value, listener reflect.Va
 	return -1
 }
 
-func (e *emitter) removeListener(listeners []reflect.Value, name string, idx int) {
+func (e *Emitter) removeListener(listeners []reflect.Value, name string, idx int) {
 	l := len(listeners)
 
 	if !(0 <= idx && idx < l) {
@@ -72,13 +99,13 @@ func (e *emitter) removeListener(listeners []reflect.Value, name string, idx int
 	e.listeners[name] = append(e.listeners[name][:idx], e.listeners[name][idx+1:]...)
 }
 
-func (e *emitter) doDispatch(listeners []reflect.Value, arguments []reflect.Value) {
+func (e *Emitter) doDispatch(listeners []reflect.Value, arguments []reflect.Value) {
 	for _, listener := range listeners {
 		listener.Call(arguments)
 	}
 }
 
-func (e *emitter) buildArguments(args ...interface{}) []reflect.Value {
+func (e *Emitter) buildArguments(args ...interface{}) []reflect.Value {
 	arguments := make([]reflect.Value, 0)
 
 	for _, arg := range args {
@@ -88,8 +115,8 @@ func (e *emitter) buildArguments(args ...interface{}) []reflect.Value {
 	return arguments
 }
 
-// Dispatch
-func (e *emitter) Dispatch(name string, args ...interface{}) {
+// Dispatch  an event to all registered listeners.
+func (e *Emitter) Dispatch(name string, args ...interface{}) {
 	arguments := e.buildArguments(args...)
 
 	e.wg.Add(1)
@@ -114,6 +141,7 @@ func (e *emitter) Dispatch(name string, args ...interface{}) {
 	}(arguments)
 }
 
-func (e *emitter) Wait() {
+// Wait all listeners
+func (e *Emitter) Wait() {
 	e.wg.Wait()
 }
