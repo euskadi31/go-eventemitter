@@ -16,13 +16,15 @@ type testSubscriber struct {
 func (s testSubscriber) SubscribedEvents() map[string][]interface{} {
 	return map[string][]interface{}{
 		"test": {
-			s.onTest,
+			s.onTest(),
 		},
 	}
 }
 
-func (s *testSubscriber) onTest() {
+func (s *testSubscriber) onTest() func() {
+	return func() {
 
+	}
 }
 
 func TestEmitter(t *testing.T) {
@@ -153,9 +155,8 @@ func TestSubscriber(t *testing.T) {
 
 	assert.Equal(t, 1, len(em.listeners))
 
-	//@TODO: bug
 	em.RemoveSubscriber(ts)
-	//assert.Equal(t, 0, len(em.listeners))
+	assert.Equal(t, 0, len(em.listeners))
 }
 
 func BenchmarkDispatchParallel(b *testing.B) {
