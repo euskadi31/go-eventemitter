@@ -2,6 +2,9 @@
 // Use of this source code is governed by a MIT
 // license that can be found in the LICENSE file.
 
+// Package eventemitter provides tools that allow your application
+// components to communicate with each other by dispatching
+// events and listening to them.
 package eventemitter
 
 import (

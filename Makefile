@@ -47,3 +47,11 @@ generate:
 lint:
 	@CGO_ENABLED=0 golangci-lint run ./...
 
+
+docs:
+	@mkdir -p /tmp/tmpgoroot/doc
+	@rm -rf /tmp/tmpgopath/src/github.com/euskadi31/go-eventemitter
+	@mkdir -p /tmp/tmpgopath/src/github.com/euskadi31/go-eventemitter
+	@tar -c --exclude='.git' --exclude='tmp' . | tar -x -C /tmp/tmpgopath/src/github.com/euskadi31/go-eventemitter
+	@echo -e "open http://localhost:6060/pkg/github.com/euskadi31/go-eventemitter\n"
+	@GOROOT=/tmp/tmpgoroot/ GOPATH=/tmp/tmpgopath/ godoc -http=localhost:6060
