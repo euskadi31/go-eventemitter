@@ -12,7 +12,7 @@ import (
 	"sync"
 )
 
-// EventEmitter interface
+// EventEmitter interface.
 type EventEmitter interface {
 	Subscribe(name string, listener interface{})
 
@@ -27,14 +27,14 @@ type EventEmitter interface {
 	Wait()
 }
 
-// Emitter struct
+// Emitter struct.
 type Emitter struct {
 	listeners map[string][]reflect.Value
 	sync.RWMutex
 	wg sync.WaitGroup
 }
 
-// New EventEmitter
+// New EventEmitter.
 func New() *Emitter {
 	return &Emitter{
 		listeners: make(map[string][]reflect.Value),
@@ -136,7 +136,7 @@ func (e *Emitter) Dispatch(name string, args ...interface{}) {
 			return
 		}
 
-		listeners := l[:]
+		listeners := l
 
 		e.RUnlock()
 
@@ -144,7 +144,7 @@ func (e *Emitter) Dispatch(name string, args ...interface{}) {
 	}(arguments)
 }
 
-// Wait all listeners
+// Wait all listeners.
 func (e *Emitter) Wait() {
 	e.wg.Wait()
 }
