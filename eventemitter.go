@@ -95,7 +95,7 @@ func (e *Emitter) findListenerIdx(listeners []reflect.Value, listener reflect.Va
 func (e *Emitter) removeListener(listeners []reflect.Value, name string, idx int) {
 	l := len(listeners)
 
-	if !(0 <= idx && idx < l) {
+	if idx < 0 || idx >= l {
 		return
 	}
 
