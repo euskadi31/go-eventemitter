@@ -1,5 +1,5 @@
 module github.com/euskadi31/go-eventemitter
 
-require github.com/stretchr/testify v1.11.1
+require github.com/stretchr/testify v1.12.1
 
 go 1.12
